@@ -1,0 +1,23 @@
+services:
+  backend:
+    build: ./backend
+    container_name: inventory-backend
+    volumes:
+      # Macの ./data フォルダを、コンテナ内の /app/data に繋ぐ
+      - ./data:/app/data
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    container_name: inventory-frontend
+    ports:
+      - "80:80" # Macのポート80をコンテナの80へ
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

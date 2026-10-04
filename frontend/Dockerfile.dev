@@ -1,0 +1,15 @@
+# 開発用Dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+# package.jsonをコピーして依存関係インストール
+COPY package*.json ./
+RUN npm install
+
+# ソースコードはボリュームマウントで共有
+# node_modulesはコンテナ内に保持される
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev"]

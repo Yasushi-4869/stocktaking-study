@@ -1,0 +1,21 @@
+# 開発用Dockerfile
+FROM golang:1.23-alpine
+
+# 必要なパッケージ
+RUN apk add --no-cache make git
+
+WORKDIR /app
+
+# 依存関係を先にコピー（キャッシュ効率化）
+COPY go.mod go.sum ./
+RUN go mod download
+
+# 開発ツールをインストール
+RUN go install github.com/air-verse/air@v1.61.7
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.18.1
+
+# ソースコードはボリュームマウントで共有
+
+EXPOSE 8080
+
+CMD ["air", "-c", ".air.toml"]

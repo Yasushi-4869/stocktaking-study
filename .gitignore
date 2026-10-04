@@ -1,0 +1,15 @@
+# データ
+data/
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# バックエンドの一時ファイル（Airが作るビルド成果物）
+backend/tmp/*
+./backend/tmp/**
+backend/tmp/main
+backend/stocktaking-app

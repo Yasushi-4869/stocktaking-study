@@ -1,0 +1,61 @@
+# 開発用docker-compose
+# 使用方法: docker compose -f docker-compose.dev.yml up --build
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: inventory-db-dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: inventory
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: inventory-backend-dev
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/inventory?sslmode=disable
+      JWT_SECRET: dev-secret-key-change-in-production
+    volumes:
+      # ソースコードをマウント（ホットリロード用）
+      - ./backend:/app
+      # データディレクトリ
+      - ./data:/app/data
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: inventory-frontend-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      # ソースコードをマウント（ホットリロード用）
+      - ./frontend:/app
+      # node_modulesはコンテナ内のものを使う（ホストに漏れない）
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
